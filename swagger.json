@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Ferry Proxy Lambda",
+    "description": "\n# Wifi Settings Validation API",
+    "version": "1.2"
+  },
+  "servers": [
+    {
+      "url": "https://integration.api.dh.comcast.com/dhact/dev/ferry-api/",
+      "description":"Dev URL"
+    },
+    {
+      "url": "https://integration.api.dh.comcast.com/dhact/ferry-api/",
+      "description":"Stage URL"
+    }
+  ],
+  "tags": [
+    {
+      "name": "WifiValidation",
+      "description": "Unified API to retrieve wifi settings validation rules and to validate the custom SSID/Passphrase."
+    }
+  ],
+  "paths": {
+    "/gateway/wifi-settings/validation": {
+      "post": {
+        "tags": [
+          "WifiValidation"
+        ],
+        "summary": "Wifi Setting validation",
+        "description": "<br/> **Note**: Api offers validation with the type of request sent. <br/> 1. Retrieve wifi setting validation rules <br/> 2. Retrieve default wifi settings of the given gateway. <br/> 3. Check if current ssid/passphrase changed from the default settings. <br/> 4. Validate custom ssid/passphrase against the wifi settings rules",
+        "operationId": "wifiValidation",
+        "requestBody": {
+          "description": "Request Body to validate wifi settings",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WifiValidation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/validationResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse500"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  
+  "components": {
+    "schemas": {
+      "WifiValidation": {
+        "type": "object",
+        "required": [
+          "partnerId"
+        ],
+        "properties": {
+          "partnerId": {
+            "example": "comcast",
+            "type": "string"
+          },
+          "gatewayMacAddress": {
+            "example": "aabbccddeeff",
+            "type": "string",
+            "description": "Retrieve the wifi settings default wifi settings of the given gateway along with the validation rules"
+          },
+          "isDefaultCheckRequested": {
+            "example": true,
+            "type": "boolean",
+            "description": "Check if the current ssid/passphrase changed from the default settings"
+          },
+          "isValidationRequired": {
+            "type": "boolean",
+            "example": true,
+            "description": "Validate custom ssid/passphrase against the wifi settings ruleslifecycle description"
+          },
+          "customSsid": {
+            "example": "customSsid",
+            "type": "string"
+          },
+          "customPassphrase": {
+            "example": "customPassphrase",
+            "type": "string"
+          }
+        }
+      },
+      "validationResponse": {
+        "type": "object",
+        "properties": {
+          "defaultWifiSettings": {
+            "type": "object",
+            "$ref": "#/components/schemas/defaultWifiSettings"
+          },
+          "wifiSettingsValidationDetails": {
+            "type": "object",
+            "$ref": "#/components/schemas/wifiSettingsValidationDetails"
+          }
+        }
+      },
+      "wifiSettingsValidationDetails":{
+      	"type": "object",
+        "properties": {
+          "validationRules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/validationRules"
+            }
+          },
+          "validationResult": {
+          	"$ref": "#/components/schemas/validationResult",
+            "type": "object"
+          }
+        }
+      },
+      "validationRules":{
+      	"type": "object",
+        "properties": {
+          "partnerId": {
+            "example": "ALL",
+            "type": "string"
+          },
+          "errorCode": {
+            "example": "default",
+            "type": "string"
+          },
+          "ruleType": {
+            "example": "SSID",
+            "type": "string"
+          },
+          "validationType": {
+            "example": "RESERVED_WORD",
+            "type": "string"
+          },
+          "javaPattern": {
+            "example": "(?i)c[^a-zA-Z\\\\d]*a[^a-zA-Z\\\\d]*b[^a-zA-Z\\\\d]*l[^a-zA-Z\\\\d]*e[^a-zA-Z\\\\d]*w[^a-zA-Z\\\\d]*i[^a-zA-Z\\\\d]*f[^a-zA-Z\\\\d]*i[^a-zA-Z\\\\d]*",
+            "type": "string"
+          },
+          "javascriptPattern": {
+            "example": "/c[^a-zA-Z\\\\d]*a[^a-zA-Z\\\\d]*b[^a-zA-Z\\\\d]*l[^a-zA-Z\\\\d]*e[^a-zA-Z\\\\d]*w[^a-zA-Z\\\\d]*i[^a-zA-Z\\\\d]*f[^a-zA-Z\\\\d]*i[^a-zA-Z\\\\d]*/i",
+            "type": "string"
+          },
+          "description": {
+            "example": "Your WiFi name can't include 'cable wifi'.",
+            "type": "string"
+          },
+          "legacyErrorCode": {
+            "example": "100",
+            "type": "string"
+          }
+        }
+      },
+       "validationResult":{
+      	"type": "object",
+        "properties": {
+          "validationPassed": {
+            "example": false,
+            "type": "boolean"
+          },
+          "errorCode": {
+            "example": "WIFI_NAME_INVALID_CHARACTER",
+            "type": "string"
+          },
+          "reason": {
+            "example": "Your WiFi password contains at least one invalid character.",
+            "type": "string"
+          }
+        }
+      },
+      "defaultWifiSettings":{
+      	"type": "object",
+        "properties": {
+          "defaultSsid2g": {
+            "example": "XFSETUP",
+            "type": "string"
+          },
+          "defaultPassphrase2g": {
+            "example": "default",
+            "type": "string"
+          },
+          "defaultSsid5g": {
+            "example": "XFSETUP",
+            "type": "string"
+          },
+          "defaultPassphrase5g": {
+            "example": "default",
+            "type": "string"
+          }
+        }
+      },
+      "ErrorResponse500": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "errorCode": {
+                "type": "string",
+                "example": "DOWNSTREAM_FAILURE"
+              },
+              "errorMessage": {
+                "type": "string",
+                "example": "Device not found in webpa system."
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
